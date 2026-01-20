@@ -8,23 +8,23 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import * as Linking from "expo-linking"; // ✅ add this (expo install expo-linking) [page:1]
 
-import Navbar from "./src/GlobalComponents/Navbar";
-import AnnouncementBar from "./src/Dashboard/components/AnnouncementBar";
-import HeroCarousel from "./src/Dashboard/components/HeroCarousel";
+import Navbar from "./GlobalComponents/Navbar";
+import AnnouncementBar from "./Dashboard/components/AnnouncementBar";
+import HeroCarousel from "./Dashboard/components/HeroCarousel";
 
 import SecondaryNavTabs, {
   SecondaryTabKey,
-} from "./src/Dashboard/components/SecondaryNavTabs";
+} from "./Dashboard/components/SecondaryNavTabs";
 
-import HomeContentTab from "./src/Dashboard/tabs/Home";
-import AboutTirupatiTab from "./src/Dashboard/tabs/AboutTirupatiTab";
-import ServicesTab from "./src/Dashboard/tabs/ServicesTab";
-import PlanYourVisitTab from "./src/Dashboard/tabs/PlanYourVisitTab";
-import PlacesOfInterestTab from "./src/Dashboard/tabs/PlacesOfInterestTab";
-import EventsTab from "./src/Dashboard/tabs/EventsTab";
-import HallBookingsTab from "./src/Dashboard/tabs/HallBookingsTab";
-import ExclusiveStoreTab from "./src/Dashboard/tabs/ExclusiveStoreTab";
-import FaqsTab from "./src/Dashboard/tabs/FaqsTab";
+import HomeContentTab from "./Dashboard/tabs/Home";
+import AboutTirupatiTab from "./Dashboard/tabs/AboutTirupatiTab";
+import ServicesTab from "./Dashboard/tabs/ServicesTab";
+import PlanYourVisitTab from "./Dashboard/tabs/PlanYourVisitTab";
+import PlacesOfInterestTab from "./Dashboard/tabs/PlacesOfInterestTab";
+import EventsTab from "./Dashboard/tabs/EventsTab";
+import HallBookingsTab from "./Dashboard/tabs/HallBookingsTab";
+import ExclusiveStoreTab from "./Dashboard/tabs/ExclusiveStoreTab";
+import FaqsTab from "./Dashboard/tabs/FaqsTab";
 
 export type RootStackParamList = {
   HOME: undefined;
@@ -139,7 +139,7 @@ function Shell({
           </View>
         </View>
 
-        <SecondaryNavTabs activeTab={activeTab} onTabChange={onTabChange} />
+        {/* <SecondaryNavTabs activeTab={activeTab} onTabChange={onTabChange} /> */}
 
         {children}
       </ScrollView>
