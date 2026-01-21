@@ -1,3 +1,4 @@
+// src/Dashboard/tabs/Home.tsx  (or HomeTab.tsx - keep your filename)
 import React, { useState } from "react";
 import {
   View,
@@ -9,50 +10,61 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import Ionicons from "@expo/vector-icons/Ionicons";
-// import { useNavigation } from "@react-navigation/native"; // uncomment if using react-navigation
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-export default function AboutTirupatiTab() {
-  // const navigation = useNavigation(); // uncomment if using react-navigation
+import { Routes, RootStackParamList } from "../../navigation/routes";
+import { go } from "../../navigation/go";
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
+
+type Card = {
+  title: string;
+  image: any;
+  route: keyof RootStackParamList;
+  // optional: params?: RootStackParamList[keyof RootStackParamList];
+};
+
+export default function HomeTab() {
+  const navigation = useNavigation<Nav>();
 
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [showLangDropdown, setShowLangDropdown] = useState(false);
 
-  const languages = ["English", "हिन्दी"]; // Hindi
+  const languages = ["English", "हिन्दी"];
 
-  const cardData = [
+  const cardData: Card[] = [
     {
       title: "Darshan Booking",
       image: require("../../../assets/dashboard_images/tirupati1.jpg"),
-      screen: "services", // route name (example)
+      route: Routes.SERVICES,
     },
     {
       title: "Special Sevas",
       image: require("../../../assets/dashboard_images/tirupati.jpg"),
-      screen: "services",
+      route: Routes.SERVICES,
     },
     {
       title: "Accommodation",
       image: require("../../../assets/dashboard_images/tirupati1.jpg"),
-      screen: "services",
+      route: Routes.SERVICES,
     },
   ];
 
   const handleLanguageSelect = (lang: string) => {
     setSelectedLanguage(lang);
     setShowLangDropdown(false);
-    // Here you can add language change logic (i18n, context, etc)
   };
 
-  const handleCardPress = (screenName: string) => {
-    // navigation.navigate(screenName); // uncomment if using react-navigation
-    console.log(`Navigating to: ${screenName}`);
+  const handleCardPress = (routeName: keyof RootStackParamList) => {
+    // ✅ This will update web URL to /services (because linking maps SERVICES -> "services")
+    // ✅ This also ensures incoming deep link /services opens SERVICES screen
+    go(navigation, routeName);
   };
 
   return (
     <View style={styles.container}>
-      {/* Header with language & search */}
       <View style={styles.searchHeader}>
-        {/* Language selector with dropdown */}
         <Pressable
           style={styles.langButton}
           onPress={() => setShowLangDropdown(!showLangDropdown)}
@@ -72,7 +84,6 @@ export default function AboutTirupatiTab() {
           />
         </Pressable>
 
-        {/* Dropdown Modal */}
         <Modal
           transparent
           visible={showLangDropdown}
@@ -107,7 +118,6 @@ export default function AboutTirupatiTab() {
           </Pressable>
         </Modal>
 
-        {/* Search pill */}
         <View style={styles.searchPill}>
           <Ionicons name="search-outline" size={20} color="#9b9b9b" />
 
@@ -124,13 +134,12 @@ export default function AboutTirupatiTab() {
         </View>
       </View>
 
-      {/* Cards with overlay text */}
       <View style={styles.cardRow}>
         {cardData.map((card, index) => (
           <Pressable
             key={index}
             style={styles.card}
-            onPress={() => handleCardPress(card.screen)}
+            onPress={() => handleCardPress(card.route)}
           >
             <Image
               style={styles.cardImage}
@@ -138,7 +147,6 @@ export default function AboutTirupatiTab() {
               contentFit="cover"
             />
 
-            {/* Overlay Text */}
             <View style={styles.cardOverlay}>
               <Text style={styles.cardTitle}>{card.title}</Text>
             </View>
@@ -150,10 +158,7 @@ export default function AboutTirupatiTab() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
 
   searchHeader: {
     width: "100%",
@@ -166,11 +171,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
 
-  langButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
+  langButton: { flexDirection: "row", alignItems: "center", gap: 8 },
   langIconBox: {
     width: 28,
     height: 28,
@@ -181,22 +182,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  langIconText: {
-    fontSize: 16,
-    color: "#6b6b6b",
-    fontWeight: "700",
-  },
-  langText: {
-    fontSize: 17,
-    color: "#333",
-    fontWeight: "600",
-  },
+  langIconText: { fontSize: 16, color: "#6b6b6b", fontWeight: "700" },
+  langText: { fontSize: 17, color: "#333", fontWeight: "600" },
 
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "flex-start",
-    paddingTop: 100, // adjust according to header position
+    paddingTop: 100,
   },
   dropdownContainer: {
     backgroundColor: "white",
@@ -206,17 +199,9 @@ const styles = StyleSheet.create({
     borderColor: "#e0e0e0",
     overflow: "hidden",
   },
-  dropdownItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-  },
-  dropdownItemSelected: {
-    backgroundColor: "#f0f8ff",
-  },
-  dropdownText: {
-    fontSize: 16,
-    color: "#333",
-  },
+  dropdownItem: { paddingVertical: 14, paddingHorizontal: 16 },
+  dropdownItemSelected: { backgroundColor: "#f0f8ff" },
+  dropdownText: { fontSize: 16, color: "#333" },
 
   searchPill: {
     flex: 1,
@@ -263,10 +248,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     height: 240,
   },
-  cardImage: {
-    width: "100%",
-    height: "100%",
-  },
+  cardImage: { width: "100%", height: "100%" },
   cardOverlay: {
     position: "absolute",
     bottom: 0,

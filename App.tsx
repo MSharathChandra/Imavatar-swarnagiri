@@ -6,8 +6,6 @@ import { StyleSheet, View, ScrollView, Text, Pressable } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import * as Linking from "expo-linking"; // ✅ add this (expo install expo-linking) [page:1]
-
 import Navbar from "./src/GlobalComponents/Navbar";
 import AnnouncementBar from "./src/Dashboard/components/AnnouncementBar";
 import HeroCarousel from "./src/Dashboard/components/HeroCarousel";
@@ -26,84 +24,60 @@ import HallBookingsTab from "./src/Dashboard/tabs/HallBookingsTab";
 import ExclusiveStoreTab from "./src/Dashboard/tabs/ExclusiveStoreTab";
 import FaqsTab from "./src/Dashboard/tabs/FaqsTab";
 
-export type RootStackParamList = {
-  HOME: undefined;
-  ABOUT_TIRUPATI: undefined;
-  SERVICES: undefined;
-  PLAN_YOUR_VISIT: undefined;
-  PLACES_OF_INTEREST: undefined;
-  EVENTS: undefined;
-  HALL_BOOKINGS: undefined;
-  EXCLUSIVE_STORE: undefined;
-  FAQS: undefined;
-};
+import { linking, RootStackParamList, Routes } from "./src/navigation/routes";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function tabKeyToRoute(tab: SecondaryTabKey): keyof RootStackParamList {
   switch (tab) {
     case "HOME":
-      return "HOME";
+      return Routes.HOME;
     case "ABOUT TIRUPATI":
-      return "ABOUT_TIRUPATI";
+      return Routes.ABOUT_TIRUPATI;
     case "SERVICES":
-      return "SERVICES";
+      return Routes.SERVICES;
     case "PLAN YOUR VISIT":
-      return "PLAN_YOUR_VISIT";
+      return Routes.PLAN_YOUR_VISIT;
     case "PLACES OF INTEREST":
-      return "PLACES_OF_INTEREST";
+      return Routes.PLACES_OF_INTEREST;
     case "EVENTS":
-      return "EVENTS";
+      return Routes.EVENTS;
     case "HALL BOOKINGS":
-      return "HALL_BOOKINGS";
+      return Routes.HALL_BOOKINGS;
     case "EXCLUSIVE STORE":
-      return "EXCLUSIVE_STORE";
+      return Routes.EXCLUSIVE_STORE;
     case "FAQ'S":
-      return "FAQS";
+      return Routes.FAQS;
   }
 }
 
 function routeToTabKey(route: keyof RootStackParamList): SecondaryTabKey {
   switch (route) {
-    case "HOME":
+    case Routes.HOME:
       return "HOME";
-    case "ABOUT_TIRUPATI":
+    case Routes.ABOUT_TIRUPATI:
       return "ABOUT TIRUPATI";
-    case "SERVICES":
+    case Routes.SERVICES:
       return "SERVICES";
-    case "PLAN_YOUR_VISIT":
+    case Routes.PLAN_YOUR_VISIT:
       return "PLAN YOUR VISIT";
-    case "PLACES_OF_INTEREST":
+    case Routes.PLACES_OF_INTEREST:
       return "PLACES OF INTEREST";
-    case "EVENTS":
+    case Routes.EVENTS:
       return "EVENTS";
-    case "HALL_BOOKINGS":
+    case Routes.HALL_BOOKINGS:
       return "HALL BOOKINGS";
-    case "EXCLUSIVE_STORE":
+    case Routes.EXCLUSIVE_STORE:
       return "EXCLUSIVE STORE";
-    case "FAQS":
+    case Routes.FAQS:
       return "FAQ'S";
+
+    // ✅ nested screens: keep SERVICES tab highlighted
+    case Routes.SERVICE_CATEGORY:
+    case Routes.SERVICE_DETAIL:
+      return "SERVICES";
   }
 }
-
-// ✅ URL paths (web) + deep links (native)
-const linking = {
-  // For Expo this generates the correct dev/prod prefix automatically [page:1]
-  prefixes: [Linking.createURL("/")],
-  config: {
-    screens: {
-      HOME: "",
-      ABOUT_TIRUPATI: "about-tirupati",
-      SERVICES: "services",
-      PLAN_YOUR_VISIT: "plan-your-visit",
-      PLACES_OF_INTEREST: "places-of-interest",
-      EVENTS: "events",
-      HALL_BOOKINGS: "hall-bookings",
-      EXCLUSIVE_STORE: "exclusive-store",
-      FAQS: "faqs",
-    },
-  },
-};
 
 // Common layout wrapper (keeps hero + tabs visible for every screen)
 function Shell({
@@ -119,7 +93,9 @@ function Shell({
     <View style={styles.root}>
       <StatusBar style="light" />
 
+      {/* Navbar now navigates by routes */}
       <Navbar currentPage="Home" />
+      {/* <Navbar /> */}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <AnnouncementBar />
@@ -147,15 +123,38 @@ function Shell({
   );
 }
 
+// ✅ Example nested screens (replace with your real ones)
+function ServiceCategoryScreen({ route }: any) {
+  return (
+    <View style={{ padding: 16 }}>
+      <Text>Category: {route.params.categoryId}</Text>
+    </View>
+  );
+}
+
+function ServiceDetailScreen({ route }: any) {
+  return (
+    <View style={{ padding: 16 }}>
+      <Text>
+        Category: {route.params.categoryId} | Service: {route.params.serviceId}
+      </Text>
+    </View>
+  );
+}
+
 export default function App() {
   return (
-    <NavigationContainer linking={linking} fallback={null}>
+    <NavigationContainer
+      linking={linking}
+      fallback={null}
+      // fallback can be a loader; React Navigation recommends fallback while resolving deep link
+    >
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="HOME"
+        initialRouteName={Routes.HOME}
       >
         <Stack.Screen
-          name="HOME"
+          name={Routes.HOME}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
@@ -167,7 +166,7 @@ export default function App() {
         />
 
         <Stack.Screen
-          name="ABOUT_TIRUPATI"
+          name={Routes.ABOUT_TIRUPATI}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
@@ -179,7 +178,7 @@ export default function App() {
         />
 
         <Stack.Screen
-          name="SERVICES"
+          name={Routes.SERVICES}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
@@ -190,8 +189,33 @@ export default function App() {
           )}
         />
 
+        {/* ✅ nested URLs under /services/... */}
         <Stack.Screen
-          name="PLAN_YOUR_VISIT"
+          name={Routes.SERVICE_CATEGORY}
+          children={({ navigation, route }) => (
+            <Shell
+              activeTab={routeToTabKey(route.name)}
+              onTabChange={(tab) => navigation.navigate(tabKeyToRoute(tab))}
+            >
+              <ServiceCategoryScreen route={route} />
+            </Shell>
+          )}
+        />
+
+        <Stack.Screen
+          name={Routes.SERVICE_DETAIL}
+          children={({ navigation, route }) => (
+            <Shell
+              activeTab={routeToTabKey(route.name)}
+              onTabChange={(tab) => navigation.navigate(tabKeyToRoute(tab))}
+            >
+              <ServiceDetailScreen route={route} />
+            </Shell>
+          )}
+        />
+
+        <Stack.Screen
+          name={Routes.PLAN_YOUR_VISIT}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
@@ -203,7 +227,7 @@ export default function App() {
         />
 
         <Stack.Screen
-          name="PLACES_OF_INTEREST"
+          name={Routes.PLACES_OF_INTEREST}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
@@ -215,7 +239,7 @@ export default function App() {
         />
 
         <Stack.Screen
-          name="EVENTS"
+          name={Routes.EVENTS}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
@@ -227,7 +251,7 @@ export default function App() {
         />
 
         <Stack.Screen
-          name="HALL_BOOKINGS"
+          name={Routes.HALL_BOOKINGS}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
@@ -239,7 +263,7 @@ export default function App() {
         />
 
         <Stack.Screen
-          name="EXCLUSIVE_STORE"
+          name={Routes.EXCLUSIVE_STORE}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
@@ -251,7 +275,7 @@ export default function App() {
         />
 
         <Stack.Screen
-          name="FAQS"
+          name={Routes.FAQS}
           children={({ navigation, route }) => (
             <Shell
               activeTab={routeToTabKey(route.name)}
